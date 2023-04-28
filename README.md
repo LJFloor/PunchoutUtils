@@ -1,5 +1,5 @@
 # PunchoutUtils
-A nifty utility pack for SAP OCI Punch-outs
+A nifty utility pack for SAP OCI Punch-outs in dotnet
 
 ## Features
 For now there is only one feature
