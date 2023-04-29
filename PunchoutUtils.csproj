@@ -7,7 +7,7 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageId>PunchoutUtils</PackageId>
     <Title>Punchout Utilities</Title>
-    <Version>1.0.0</Version>
+    <Version>2.0.0</Version>
     <Authors>LJFloor</Authors>
     <Company />
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -18,6 +18,10 @@
     <IncludeSymbols>False</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <Description>A nifty utility pack for SAP OCI Punch-outs for dotnet </Description>
+    <PackageIcon>package.png</PackageIcon>
+    <PackageReleaseNotes>Fixed Http Encoding issue while serializing
+Added option to deserialize to custom model
+Removed ItemType enum</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,6 +30,10 @@
 
   <ItemGroup>
     <None Update="LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="package.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
