@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Primitives;
 using PunchoutUtils.Attributes;
 using PunchoutUtils.Models;
 using System.Reflection;
@@ -12,11 +11,39 @@ namespace PunchoutUtils
     public class PunchoutSerializer
     {
         /// <summary>
+        /// Parse from an http body string to the default PunchoutEntry model
+        /// </summary>
+        /// <param name="httpBody"></param>
+        /// <returns></returns>
+        public static IEnumerable<PunchoutEntry> Deserialize(string httpBody) => Deserialize<PunchoutEntry>(httpBody);
+
+        /// <summary>
+        /// Parse from an Http body stream to the default PunchoutEntry mod
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public static IEnumerable<PunchoutEntry> Deserialize(Stream stream) => Deserialize<PunchoutEntry>(stream);
+
+        /// <summary>
+        /// Parse from an ASP.NET IFormCollection (Request.Forms) to the default PunchoutEntry model
+        /// </summary>
+        /// <param name="form"></param>
+        /// <returns></returns>
+        public static IEnumerable<PunchoutEntry> Deserialize(IFormCollection form) => Deserialize<PunchoutEntry>(form);
+
+        /// <summary>
+        /// Parse from an enumerable KeyValuePair or Dictionary to the default PunchoutEntry model
+        /// </summary>
+        /// <param name="keyValuePairs"></param>
+        /// <returns></returns>
+        public static IEnumerable<PunchoutEntry> Deserialize(IEnumerable<KeyValuePair<string, string>> keyValuePairs) => Deserialize<PunchoutEntry>(keyValuePairs);
+
+        /// <summary>
         /// Parse from an Http body string
         /// </summary>
         /// <param name="httpBody"></param>
         /// <returns></returns>
-        public static Punchout Deserialize(string httpBody)
+        public static IEnumerable<T> Deserialize<T>(string httpBody) where T : new()
         {
             var dict = new Dictionary<string, string>();
             foreach (var keyValue in httpBody.Split('&'))
@@ -28,7 +55,7 @@ namespace PunchoutUtils
                 dict.Add(split[0], split[1]);
             }
 
-            return Deserialize(dict);
+            return Deserialize<T>(dict);
         }
 
         /// <summary>
@@ -36,10 +63,10 @@ namespace PunchoutUtils
         /// </summary>
         /// <param name="stream"></param>
         /// <returns></returns>
-        public static Punchout Deserialize(Stream stream)
+        public static IEnumerable<T> Deserialize<T>(Stream stream) where T : new()
         {
             using var sr = new StreamReader(stream);
-            return Deserialize(sr.ReadToEnd());
+            return Deserialize<T>(sr.ReadToEnd());
         }
 
         /// <summary>
@@ -47,14 +74,14 @@ namespace PunchoutUtils
         /// </summary>
         /// <param name="form"></param>
         /// <returns></returns>
-        public static Punchout Deserialize(IFormCollection form)
+        public static IEnumerable<T> Deserialize<T>(IFormCollection form) where T : new()
         {
             var dict = new Dictionary<string, string>();
             foreach (var keyValue in form)
             {
                 dict.Add(keyValue.Key, keyValue.Value);
             }
-            return Deserialize(dict);
+            return Deserialize<T>(dict);
         }
 
         /// <summary>
@@ -62,12 +89,15 @@ namespace PunchoutUtils
         /// </summary>
         /// <param name="keyValuePairs"></param>
         /// <returns></returns>
-        public static Punchout Deserialize(IEnumerable<KeyValuePair<string, string>> keyValuePairs)
+        public static IEnumerable<T> Deserialize<T>(IEnumerable<KeyValuePair<string, string>> keyValuePairs) where T : new()
         {
-            var punchout = new Punchout();
+            var entries = new Dictionary<int, T>();
             foreach (var keyValue in keyValuePairs)
             {
-                foreach (var property in PunchoutEntry.GetPublicProperties())
+                // Get all public properties
+                PropertyInfo[] properties = typeof(T).GetProperties().Where(p => p.GetMethod?.IsPublic ?? false).ToArray();
+
+                foreach (var property in properties)
                 {
                     var pattern = Regex.Escape(property.GetCustomAttribute<FieldNameAttribute>()?.Name ?? "").Replace("n", @"(\d)");
                     if (string.IsNullOrWhiteSpace(pattern)) continue;
@@ -77,60 +107,72 @@ namespace PunchoutUtils
                     if (!match.Success) continue;
 
                     var id = int.Parse(match.Groups[1].Value);
-                    var entry = punchout.Entries.FirstOrDefault(e => e.Id == id) ?? new PunchoutEntry();
-                    entry.Id = id;
 
-                    property.SetValue(entry, ParseValue(keyValue.Value, property));
+                    // Get the keyvalue with the specified id, or create a new one if it doesn't exist.
+                    var entry = entries.FirstOrDefault(e => e.Key == id);
+                    if (entry.Value == null)
+                    {
+                        entry = new KeyValuePair<int, T>(id, new T());
+                    }
+
+                    property.SetValue(entry.Value, ParseValue(keyValue.Value, property));
 
                     // Update the entry
-                    punchout.Entries.Remove(entry);
-                    punchout.Entries.Add(entry);
+                    entries.Remove(entry.Key);
+                    entries.Add(entry.Key, entry.Value);
                 }
+                
             }
 
-            return punchout;
+            return entries.Values;
         }
 
         /// <summary>
-        /// Serialize the punchout entries to a http body string
+        /// Serialize an entry to a http body string
         /// </summary>
-        /// <param name="punchout">The punchout from which the entries should be serialized</param>
+        /// <param name="entry"></param>
         /// <returns></returns>
-        public static string Serialize(Punchout punchout) => Serialize(punchout.Entries);
+        public static string Serialize(object entry) => Serialize(new object[] { entry });
 
         /// <summary>
         /// Serialize the punchout entries to a http body string
         /// </summary>
         /// <param name="entries">The entries to serialize</param>
         /// <returns></returns>
-        public static string Serialize(IEnumerable<PunchoutEntry> entries)
+        public static string Serialize(IEnumerable<object> entries)
         {
             if (!entries.Any()) return string.Empty;
 
             string str = "";
 
-            foreach (var entry in entries)
+            int i = 0;
+            foreach (object? entry in entries)
             {
                 // Get all public properties
-                PropertyInfo[] properties = PunchoutEntry.GetPublicProperties();
+                PropertyInfo[] properties = entry.GetType().GetProperties().Where(p => p.GetMethod?.IsPublic ?? false).ToArray();
 
                 foreach (PropertyInfo? property in properties)
                 {
-                    var key = property.GetCustomAttribute<FieldNameAttribute>()?.Name.Replace("n", entry.Id.ToString());
+                    var key = property.GetCustomAttribute<FieldNameAttribute>()?.Name.Replace("n", i.ToString());
                     var value = property.GetValue(entry);
 
                     if (key == null || value == null) continue;
 
                     var stringValue = SerializeValue(value);
                     if (stringValue == null) continue;
-                    
 
-                    str += "NEW_ITEM-" + key + "=" + HttpUtility.UrlEncodeUnicode(stringValue) + '&';
+                    str += HttpUtility.UrlEncodeUnicode("NEW_ITEM-" + key + "=" + stringValue) + '&';
                 }
+                i++;
             }
 
             // Remove the last trailing '&'
-            return str.Remove(str.Length - 1);
+            if (str.Length > 1)
+            {
+                str = str.Remove(str.Length - 1);
+            }
+
+            return str;
         }
 
         private static string? SerializeValue(object value)
@@ -192,6 +234,31 @@ namespace PunchoutUtils
             else if (type == typeof(char))
             {
                 return char.Parse(value);
+            }
+
+            else if (type == typeof(uint))
+            {
+                return uint.Parse(value);
+            }
+
+            else if (type == typeof(short))
+            {
+                return short.Parse(value);
+            }
+
+            else if (type == typeof(ushort))
+            {
+                return ushort.Parse(value);
+            }
+
+            else if (type == typeof(long))
+            {
+                return long.Parse(value);
+            }
+
+            else if (type == typeof(ulong))
+            {
+                return ulong.Parse(value);
             }
 
             else if (type.IsEnum)
