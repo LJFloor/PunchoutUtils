@@ -161,7 +161,7 @@ namespace PunchoutUtils
                     var stringValue = SerializeValue(value);
                     if (stringValue == null) continue;
 
-                    str += HttpUtility.UrlEncodeUnicode("NEW_ITEM-" + key + "=" + stringValue) + '&';
+                    str += HttpUtility.UrlEncodeUnicode("NEW_ITEM-" + key) + '=' + HttpUtility.UrlEncodeUnicode(stringValue) + '&';
                 }
                 i++;
             }

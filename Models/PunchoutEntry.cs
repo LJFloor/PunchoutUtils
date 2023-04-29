@@ -239,12 +239,11 @@ namespace PunchoutUtils.Models
         public string? CustomField5 { get; set; }
 
         /// <summary>
-        /// Item type root, outline or leaf. Introduced since SRM 7.0 onwards.
+        /// Item type root (R), outline (O) or leaf (L). Introduced since SRM 7.0 onwards.
         /// </summary>
         [JsonPropertyName("item_type")]
         [FieldName("ITEM_TYPE[n]")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        public ItemType? ItemType { get; set; }
+        public char? ItemType { get; set; }
 
         /// <summary>
         /// An integer field that defines what the parent of the current item is in the hierarchy structure. This field will be null for an item
