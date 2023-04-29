@@ -1,3 +1,4 @@
+
 # PunchoutUtils
 A nifty utility pack for SAP OCI Punch-outs for dotnet
 
@@ -29,11 +30,13 @@ var entries = PunchoutSerializer.Deserialize("NEW_ITEM-DESCRIPTION%5B0%5D%3DRubb
 var text = PunchoutSerializer.Serialize(entries);		
 
 // Or a single item 
-PunchoutSerialize.Serialize(entries.First());
+text = PunchoutSerialize.Serialize(entries.First());
 ```
 
 You can also deserialize to your custom model you use for your webshop or your ERP system. Make sure you map the correct fields to your model:
 ```csharp
+using PunchoutUtils.Attributes;
+
 public class MyCustomModel 
 {
 	[FieldName("DESCRIPTION[n]")]
