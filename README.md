@@ -16,7 +16,7 @@ Below is a neatly formatted version so you can read it:
 NEW_ITEM-DESCRIPTION[0]=Rubber duck&
 NEW_ITEM-QUANTITY[0]=1&
 NEW_ITEM-DESCRIPTION[1]=Data structures in PHP (book)&
-NEW_ITEM-QUANTITY[1]=1&
+NEW_ITEM-QUANTITY[1]=1
 ```
 
 Of course, there are many more fields as documented: [https://punchoutcommerce.com/docs/sap-oci-5.pdf](https://punchoutcommerce.com/docs/sap-oci-5.pdf#%5B%7B%22num%22%3A50%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C112.5%2C726.25%2C0%5D)
