@@ -1,6 +1,6 @@
 namespace PunchoutUtils.Attributes
 {
-    PUBLIC class FieldNameAttribute : Attribute
+    public class FieldNameAttribute : Attribute
     {
         public string Name { get; set; }
 
