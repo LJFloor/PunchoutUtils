@@ -56,3 +56,7 @@ var entries = PunchoutSerializer.Deserialize<MyCustomModel>("NEW_ITEM-DESCRIPTIO
 
 ## Bugs
 Please create an issue if you find anything that doesn't seem right.
+
+## To do:
+ - [ ] Convert `Quantity` to a float
+ - [ ] Throw exception on invalid data type saying which field failed
