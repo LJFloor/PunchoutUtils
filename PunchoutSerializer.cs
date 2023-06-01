@@ -99,7 +99,7 @@ namespace PunchoutUtils
 
                 foreach (var property in properties)
                 {
-                    var pattern = Regex.Escape(property.GetCustomAttribute<FieldNameAttribute>()?.Name ?? "").Replace("n", @"(\d)");
+                    var pattern = "NEW_ITEM-" + Regex.Escape(property.GetCustomAttribute<FieldNameAttribute>()?.Name ?? Guid.NewGuid().ToString()).Replace("n", @"(\d)");
                     if (string.IsNullOrWhiteSpace(pattern)) continue;
 
                     var match = Regex.Match(keyValue.Key, pattern);
