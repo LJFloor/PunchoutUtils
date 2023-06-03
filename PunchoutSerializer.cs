@@ -43,7 +43,7 @@ namespace PunchoutUtils
         /// </summary>
         /// <param name="httpBody"></param>
         /// <returns></returns>
-        public static IEnumerable<T> Deserialize<T>(string httpBody) where T : new()
+        public static IEnumerable<T> Deserialize<T>(string httpBody) where T : IPunchoutEntry, new()
         {
             var dict = new Dictionary<string, string>();
             foreach (var keyValue in httpBody.Split('&'))
@@ -63,7 +63,7 @@ namespace PunchoutUtils
         /// </summary>
         /// <param name="stream"></param>
         /// <returns></returns>
-        public static IEnumerable<T> Deserialize<T>(Stream stream) where T : new()
+        public static IEnumerable<T> Deserialize<T>(Stream stream) where T : IPunchoutEntry, new()
         {
             using var sr = new StreamReader(stream);
             return Deserialize<T>(sr.ReadToEnd());
@@ -74,11 +74,12 @@ namespace PunchoutUtils
         /// </summary>
         /// <param name="form"></param>
         /// <returns></returns>
-        public static IEnumerable<T> Deserialize<T>(IFormCollection form) where T : new()
+        public static IEnumerable<T> Deserialize<T>(IFormCollection form) where T : IPunchoutEntry, new()
         {
             var dict = new Dictionary<string, string>();
             foreach (var keyValue in form)
             {
+
                 dict.Add(keyValue.Key, keyValue.Value);
             }
             return Deserialize<T>(dict);
@@ -89,7 +90,7 @@ namespace PunchoutUtils
         /// </summary>
         /// <param name="keyValuePairs"></param>
         /// <returns></returns>
-        public static IEnumerable<T> Deserialize<T>(IEnumerable<KeyValuePair<string, string>> keyValuePairs) where T : new()
+        public static IEnumerable<T> Deserialize<T>(IEnumerable<KeyValuePair<string, string>> keyValuePairs) where T : IPunchoutEntry, new()
         {
             var entries = new Dictionary<int, T>();
             foreach (var keyValue in keyValuePairs)
@@ -112,7 +113,9 @@ namespace PunchoutUtils
                     var entry = entries.FirstOrDefault(e => e.Key == id);
                     if (entry.Value == null)
                     {
-                        entry = new KeyValuePair<int, T>(id, new T());
+                        var t = new T() { Id = id };
+                        t.GetType().GetProperty("Id").SetValue(t, id);
+                        entry = new KeyValuePair<int, T>(id, t);
                     }
 
                     property.SetValue(entry.Value, ParseValue(keyValue.Value, property));
@@ -121,7 +124,7 @@ namespace PunchoutUtils
                     entries.Remove(entry.Key);
                     entries.Add(entry.Key, entry.Value);
                 }
-                
+
             }
 
             return entries.Values;
@@ -275,7 +278,7 @@ namespace PunchoutUtils
                 return Enum.Parse(type, enumName, true);
             }
 
-            return null;
+            throw new TypeAccessException($"Deserialization to type {type.FullName} is not supported.");
         }
     }
 }

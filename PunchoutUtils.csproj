@@ -7,7 +7,7 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageId>PunchoutUtils</PackageId>
     <Title>Punchout Utilities</Title>
-    <Version>2.0.1</Version>
+    <Version>2.0.3</Version>
     <Authors>LJFloor</Authors>
     <Company />
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -19,9 +19,11 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <Description>A nifty utility pack for SAP OCI Punch-outs for dotnet </Description>
     <PackageIcon>package.png</PackageIcon>
-    <PackageReleaseNotes>Fixed Http Encoding issue while serializing
-Added option to deserialize to custom model
-Removed ItemType enum</PackageReleaseNotes>
+    <PackageReleaseNotes>
+		- Changed the Quantity property to a float, since you could buy 1.3 KG of salt for example
+		- Throw an exception on an invalid type (now just ignores the field)
+		- Made the Id property actually do a thing
+	</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

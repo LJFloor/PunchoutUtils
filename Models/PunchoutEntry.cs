@@ -4,10 +4,10 @@ using System.Text.Json.Serialization;
 
 namespace PunchoutUtils.Models
 {
-    public class PunchoutEntry
+    public class PunchoutEntry : IPunchoutEntry
     {
         [JsonPropertyName("id")]
-        public int Id { get; set; }
+        public int Id { get; init; }
 
         /// <summary>
         /// Description of the item
