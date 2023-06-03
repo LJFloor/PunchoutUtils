@@ -278,7 +278,7 @@ namespace PunchoutUtils
                 return Enum.Parse(type, enumName, true);
             }
 
-            throw new TypeAccessException($"Deserialization to type {type.FullName} is not supported.");
+            throw new SerializationException($"Deserialization to type {type.FullName} is not supported.");
         }
     }
 }
