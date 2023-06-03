@@ -33,11 +33,12 @@ var text = PunchoutSerializer.Serialize(entries);
 text = PunchoutSerialize.Serialize(entries.First());
 ```
 
-You can also deserialize to your custom model you use for your webshop or your ERP system. Make sure you map the correct fields to your model:
+You can also deserialize to your custom model you use for your webshop or your ERP system. Your model should implement the `IPunchoutEntry` interface. 
+It is also possible to inherit the `PunchoutEntry` model, since this class implements `IPunchoutEntry` as well. Make sure you map the correct fields to your model:
 ```csharp
 using PunchoutUtils.Attributes;
 
-public class MyCustomModel 
+public class MyCustomModel : IPunchoutEntry
 {
 	[FieldName("DESCRIPTION[n]")]
 	public string Description { get; set; }
@@ -55,9 +56,4 @@ var entries = PunchoutSerializer.Deserialize<MyCustomModel>("NEW_ITEM-DESCRIPTIO
 ```
 
 ## Bugs
-Please create an issue if you find anything that doesn't seem right.
-
-## To do:
- - [ ] Convert `Quantity` to a float
- - [ ] Throw exception on invalid data type saying which field failed
- - [ ] Use the `Id` property
+Please create an issue on the github repo if you find anything that doesn't seem right.

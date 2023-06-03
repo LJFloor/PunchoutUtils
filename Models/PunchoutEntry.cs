@@ -4,10 +4,10 @@ using System.Text.Json.Serialization;
 
 namespace PunchoutUtils.Models
 {
-    public class PunchoutEntry
+    public class PunchoutEntry : IPunchoutEntry
     {
         [JsonPropertyName("id")]
-        public int Id { get; set; }
+        public int Id { get; init; }
 
         /// <summary>
         /// Description of the item
@@ -28,7 +28,7 @@ namespace PunchoutUtils.Models
         /// </summary>
         [JsonPropertyName("quantity")]
         [FieldName("QUANTITY[n]")]
-        public int Quantity { get; set; }
+        public float Quantity { get; set; }
 
         /// <summary>
         /// Quantity unit for item quantity
@@ -56,7 +56,7 @@ namespace PunchoutUtils.Models
         /// </summary>
         [JsonPropertyName("price_unit")]
         [FieldName("PRICEUNIT[n]")]
-        public int PriceUnit { get; set; } = 1;
+        public int? PriceUnit { get; set; } = 1;
 
         /// <summary>
         /// Delivery time of the item in days
