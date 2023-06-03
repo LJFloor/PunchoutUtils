@@ -231,7 +231,7 @@ namespace PunchoutUtils
 
             else if (type == typeof(bool))
             {
-                return value.ToString().ToUpper() == "X";
+                return value.Length > 0;
             }
 
             else if (type == typeof(char))
