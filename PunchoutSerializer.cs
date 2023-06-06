@@ -193,6 +193,11 @@ namespace PunchoutUtils
                     ?.GetCustomAttribute<EnumMemberAttribute>()?.Value ?? value.ToString();
             }
 
+            else if (type == typeof(float)) 
+            {
+                return ((float)value).ToString(CultureInfo.InvariantCulture);
+            }
+            
             else if (type == typeof(bool))
             {
                 return (bool)value ? "X" : null;
@@ -216,12 +221,12 @@ namespace PunchoutUtils
             else if (type == typeof(int))
             {
                 // We first parse to a float, so a value like 2.00 will still be recognized and cut off to 2
-                return (int)float.Parse(value);
+                return (int)float.Parse(value, NumberStyles.Float, CultureInfo.InvariantCulture);
             }
 
             else if (type == typeof(float))
             {
-                return float.Parse(value);
+                return float.Parse(value, NumberStyles.Float, CultureInfo.InvariantCulture);
             }
 
             else if (type == typeof(Uri))
