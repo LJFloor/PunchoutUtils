@@ -7,7 +7,7 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageId>PunchoutUtils</PackageId>
     <Title>Punchout Utilities</Title>
-    <Version>2.0.3</Version>
+    <Version>2.0.4</Version>
     <Authors>LJFloor</Authors>
     <Company />
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -19,13 +19,7 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <Description>A nifty utility pack for SAP OCI Punch-outs for dotnet </Description>
     <PackageIcon>package.png</PackageIcon>
-    <PackageReleaseNotes>
-		- Changed the Quantity property to a float, since you could buy 1.3 KG of salt for example
-		- Throw an exception on an invalid type (now just ignores the field)
-		- Made the Id property actually do a thing
-		- Boolean deserialization is more accessable (ANY value will now return true, empty/null returns false)
-		- Made priceunit nullable
-	</PackageReleaseNotes>
+    <PackageReleaseNotes>Fixed float decimal point localization</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
